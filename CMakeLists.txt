@@ -3,4 +3,6 @@ project(RenderingEngines)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(RenderingEngines main.cpp)
+add_executable(RenderingEngines main.cpp
+        Student.cpp
+        Student.h)
