@@ -6,11 +6,11 @@
 #include <sstream>
 #include "core/mesh.h"
 #include "core/assimpLoader.h"
-#include "core/camera.h"
-#include "core/Light.h"
-#include "core/LightShaderData.h"
+#include "core/Objects/camera.h"
+#include "core/Objects/Light.h"
 #include "core/UserConfig.h"
 #include "core/texture.h"
+#include "core/Rendering/ModelRenderer.h"
 
 //#define MAC_CLION
 #define VSTUDIO
@@ -37,7 +37,7 @@ void processInput(GLFWwindow *window) {
         glfwSetWindowShouldClose(window, true);
 }
 
-void processCameraInput(GLFWwindow *window, core::Camera &camera, float deltaTime)
+void processCameraInput(GLFWwindow *window, core::objects::Camera &camera, float deltaTime)
 {
     float cameraSpeed = core::UserConfig::cameraTranslationSpeed;
     float rotationSpeed = core::UserConfig::cameraRotationSpeed;
@@ -87,8 +87,7 @@ void processCameraInput(GLFWwindow *window, core::Camera &camera, float deltaTim
     }
 }
 
-void framebufferSizeCallback(GLFWwindow *window,
-                             int width, int height) {
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     g_width = width;
     g_height = height;
     glViewport(0, 0, width, height);
@@ -168,26 +167,9 @@ int main() {
     const GLuint fragmentShader = generateShader("shaders/fragment.fs", GL_FRAGMENT_SHADER);
     const GLuint textureShader = generateShader("shaders/texture.fs", GL_FRAGMENT_SHADER);
 
-    int success;
-    char infoLog[512];
-    const unsigned int modelShaderProgram = glCreateProgram();
-    glAttachShader(modelShaderProgram, modelVertexShader);
-    glAttachShader(modelShaderProgram, fragmentShader);
-    glLinkProgram(modelShaderProgram);
-    glGetProgramiv(modelShaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(modelShaderProgram, 512, NULL, infoLog);
-        printf("Error! Making Shader Program: %s\n", infoLog);
-    }
-    const unsigned int textureShaderProgram = glCreateProgram();
-    glAttachShader(textureShaderProgram, vertexShader);
-    glAttachShader(textureShaderProgram, fragmentShader);
-    glLinkProgram(textureShaderProgram);
-    glGetProgramiv(textureShaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(textureShaderProgram, 512, NULL, infoLog);
-        printf("Error! Making Shader Program: %s\n", infoLog);
-    }
+    core::rendering::ModelRenderer modelRenderer;
+    modelRenderer.GenerateShaderProgram(modelVertexShader, textureShader);
+    modelRenderer.GenerateShaderProgram(vertexShader, fragmentShader);
 
     glDeleteShader(modelVertexShader);
     glDeleteShader(vertexShader);
@@ -200,33 +182,29 @@ int main() {
     quadModel.scale(glm::vec3(5, 5, 1));
 
     core::Model suzanne = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    suzanne2.translate(glm::vec3(6, 0,0));
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     glClearColor(clearColor.r,
                  clearColor.g, clearColor.b, clearColor.a);
-
-    //Generate Lights
-    std::vector<core::Light*> lights;
-    lights.push_back(new core::Light(core::Directional, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
-    lights.push_back(new core::Light(core::Point, glm::vec3(-10.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0,0),0,0));
-    lights.push_back(new core::Light(core::Spot, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0,0),5,3));
-    lights.push_back(new core::Light(core::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
-
-    core::Camera camera = core::Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    core::objects::Camera camera = core::objects::Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
     //VP
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(g_width) / static_cast<float>(g_height), 0.1f, 100.0f);
 
-    GLint mvpMatrixUniform = glGetUniformLocation(modelShaderProgram, "mvpMatrix");
-    GLint textureModelUniform = glGetUniformLocation(textureShaderProgram, "mvpMatrix");
-    GLint textureUniform = glGetUniformLocation(textureShaderProgram, "text");
+    //Generate Lights
+    std::vector<core::objects::Light*> lights;
+    lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
+    lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-10.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0,0),0,0));
+    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0,0),5,3));
+    lights.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
+
+
     // Load Light Shader Data
-    core::LightShaderData lightShaderData = core::LightShaderData(lights.size(), textureShaderProgram);
-    lightShaderData.GetUniforms();
-    core::LightShaderData lightShaderData2 = core::LightShaderData(lights.size(), modelShaderProgram);
-    lightShaderData2.GetUniforms();
+    modelRenderer.GenerateLightShaderDatas(lights.size());
 
     double currentTime = glfwGetTime();
     double finishFrameTime = 0.0;
@@ -263,22 +241,10 @@ int main() {
         processCameraInput(window, camera, deltaTime);
         processInput(window);
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
-
-        lightShaderData.ApplyUniforms(lights);
-        lightShaderData2.ApplyUniforms(lights);
-        glUseProgram(textureShaderProgram);
-        glUniformMatrix4fv(textureModelUniform, 1, GL_FALSE, glm::value_ptr(projection * camera.modelMatrix * quadModel.getModelMatrix()));
-        glActiveTexture(GL_TEXTURE0);
-        glUniform1i(textureUniform, 0);
-        glBindTexture(GL_TEXTURE_2D, cmgtGatoTexture.getId());
-        quadModel.render();
-        glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0);
-
-        glUseProgram(modelShaderProgram);
-        glUniformMatrix4fv(mvpMatrixUniform, 1, GL_FALSE, glm::value_ptr(projection * camera.modelMatrix * suzanne.getModelMatrix()));
-        suzanne.render();
-        glBindVertexArray(0);
+        modelRenderer.ApplyLightShaderData(lights);
+        modelRenderer.Render(quadModel, 1, projection * camera.modelMatrix, cmgtGatoTexture);
+        modelRenderer.Render(suzanne2, 1, projection * camera.modelMatrix, cmgtGatoTexture);
+        modelRenderer.Render(suzanne, 0, projection * camera.modelMatrix, cmgtGatoTexture);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -290,8 +256,12 @@ int main() {
         currentTime = finishFrameTime;
     }
 
-    glDeleteProgram(modelShaderProgram);
-    glDeleteProgram(textureShaderProgram);
+
+
+
+
+
+    //End
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

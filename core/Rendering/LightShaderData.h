@@ -7,9 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "Light.h"
+#include "../Objects/Light.h"
 
-namespace core
+namespace core::rendering
 {
     class LightShaderData
     {
@@ -29,6 +29,6 @@ namespace core
         std::vector<GLint> spotLightFalloffUniforms;
 
         void GetUniforms();
-        void ApplyUniforms(std::vector<Light*> lights) const;
+        void ApplyUniforms(std::vector<objects::Light*> lights) const;
     };
 }

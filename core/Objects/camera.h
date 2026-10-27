@@ -6,7 +6,7 @@
 
 #include "glm/glm.hpp"
 
-namespace core
+namespace core::objects
 {
     class Camera
     {

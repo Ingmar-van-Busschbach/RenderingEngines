@@ -29,8 +29,8 @@ out Varyings varyings;
 
 void main()
 {
-    varyings.position = vertexPosition;
-    varyings.normal = vertexNormal;
+    varyings.position = (mvpMatrix * vec4(vertexPosition, 1.0)).rgb;
+    varyings.normal = (mvpMatrix * vec4(vertexNormal, 1.0)).rgb;
     varyings.uv = vertexUV;
     gl_Position = mvpMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
 }

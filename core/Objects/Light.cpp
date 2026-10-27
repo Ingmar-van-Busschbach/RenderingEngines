@@ -4,7 +4,7 @@
 
 #include "Light.h"
 
-namespace core
+namespace core::objects
 {
     Light::Light(LightType lightType, glm::vec3 lightPosition, glm::vec3 lightDirection, glm::vec4 lightColor, float lightIntensity, glm::vec3 lightAttenuation, float spotLightAngle, float spotLightFalloff)
     {

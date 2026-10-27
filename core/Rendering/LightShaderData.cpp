@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace core
+namespace core::rendering
 {
     LightShaderData::LightShaderData(int lightCount, GLuint shaderProgram)
     {
@@ -49,7 +49,7 @@ namespace core
         }
     }
 
-    void LightShaderData::ApplyUniforms(std::vector<Light*> lights) const
+    void LightShaderData::ApplyUniforms(std::vector<objects::Light*> lights) const
     {
         glUseProgram(shaderProgram);
         glUniform1i(lightCountUniform, lightCount);
