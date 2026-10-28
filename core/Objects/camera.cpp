@@ -19,8 +19,9 @@ namespace core::objects
         cameraUp = glm::cross(cameraForward, cameraRight);
         rotation = glm::vec3(0.0f, 0.0f, 0.0f);
         translationMatrix = glm::mat4(1.0f);
-        rotationMatrix = glm::mat4(1.0f);//glm::lookAt(cameraPos, cameraTarget, cameraUp);
-        modelMatrix = translationMatrix * rotationMatrix;
+        translationMatrix = glm::translate(translationMatrix, -position);
+        rotationMatrix = glm::mat4(1.0f);
+        modelMatrix = rotationMatrix * translationMatrix;
     }
 
     void Camera::UpdateAxis()

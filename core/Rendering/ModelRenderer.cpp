@@ -22,6 +22,7 @@ namespace core::rendering
         }
         shaderPrograms.clear();
         lightShaderDatas.clear();
+        matrixShaderDatas.clear();
         textureUniforms.clear();
         matrixUniforms.clear();
     }
@@ -44,12 +45,14 @@ namespace core::rendering
         return shaderProgram;
     }
 
-    void ModelRenderer::GenerateLightShaderDatas(int lightCount)
+    void ModelRenderer::GenerateShaderDatas(int lightCount)
     {
         for (int i = 0; i < shaderPrograms.size(); i++)
         {
-            lightShaderDatas.push_back(new core::rendering::LightShaderData(lightCount, shaderPrograms.at(i)));
-            lightShaderDatas.at(i)->GetUniforms();
+            lightShaderDatas.push_back(core::rendering::LightShaderData(lightCount, shaderPrograms.at(i)));
+            lightShaderDatas.at(i).GetUniforms();
+            matrixShaderDatas.push_back(shaderPrograms.at(i));
+            matrixShaderDatas.at(i).GetUniforms();
             textureUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "text"));
             matrixUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "mvpMatrix"));
         }
@@ -59,14 +62,19 @@ namespace core::rendering
     {
         for (int i = 0; i < lightShaderDatas.size(); i++)
         {
-            lightShaderDatas.at(i)->ApplyUniforms(lights);
+            lightShaderDatas.at(i).ApplyUniforms(lights);
         }
     }
 
-    void ModelRenderer::Render(core::Model model, int shaderProgramIndex, glm::mat4 matrix, core::Texture texture) const
+    void ModelRenderer::ApplyMatrixShaderData(const int index, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) const
+    {
+        matrixShaderDatas.at(index).ApplyUniforms(modelMatrix, viewMatrix, projectionMatrix);
+    }
+
+    void ModelRenderer::Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::Texture texture) const
     {
         glUseProgram(shaderPrograms.at(shaderProgramIndex));
-        glUniformMatrix4fv(matrixUniforms.at(shaderProgramIndex), 1, GL_FALSE, glm::value_ptr(matrix * model.getModelMatrix()));
+        this->ApplyMatrixShaderData(shaderProgramIndex, model.getModelMatrix(), viewMatrix, projectionMatrix);
         glActiveTexture(GL_TEXTURE0);
         glUniform1i(textureUniforms.at(shaderProgramIndex), 0);
         glBindTexture(GL_TEXTURE_2D, texture.getId());

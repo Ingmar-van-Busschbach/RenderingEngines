@@ -189,10 +189,9 @@ int main() {
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     glClearColor(clearColor.r,
                  clearColor.g, clearColor.b, clearColor.a);
+
+
     core::objects::Camera camera = core::objects::Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
-    //VP
-
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(g_width) / static_cast<float>(g_height), 0.1f, 100.0f);
 
     //Generate Lights
@@ -204,7 +203,7 @@ int main() {
 
 
     // Load Light Shader Data
-    modelRenderer.GenerateLightShaderDatas(lights.size());
+    modelRenderer.GenerateShaderDatas(lights.size());
 
     double currentTime = glfwGetTime();
     double finishFrameTime = 0.0;
@@ -242,9 +241,9 @@ int main() {
         processInput(window);
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         modelRenderer.ApplyLightShaderData(lights);
-        modelRenderer.Render(quadModel, 1, projection * camera.modelMatrix, cmgtGatoTexture);
-        modelRenderer.Render(suzanne2, 1, projection * camera.modelMatrix, cmgtGatoTexture);
-        modelRenderer.Render(suzanne, 0, projection * camera.modelMatrix, cmgtGatoTexture);
+        modelRenderer.Render(quadModel, 1, camera.modelMatrix, projection, cmgtGatoTexture);
+        modelRenderer.Render(suzanne2, 1, camera.modelMatrix, projection, cmgtGatoTexture);
+        modelRenderer.Render(suzanne, 1, camera.modelMatrix, projection, cmgtGatoTexture);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

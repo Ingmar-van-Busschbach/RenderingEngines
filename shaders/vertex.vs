@@ -14,12 +14,19 @@ struct Light
 
 struct Varyings
 {
-    vec3 position;
-    vec3 normal;
+    vec3 positionWS;
+    vec3 normalWS;
     vec2 uv;
 };
 
-uniform mat4 mvpMatrix;
+struct MatrixData
+{
+   mat4 modelMatrix;
+   mat4 viewMatrix;
+   mat4 projectionMatrix;
+};
+
+uniform MatrixData matrixData;
 uniform int lightCount;
 uniform Light lights[20];
 layout (location = 0) in vec3 vertexPosition;
@@ -29,8 +36,8 @@ out Varyings varyings;
 
 void main()
 {
-    varyings.position = (mvpMatrix * vec4(vertexPosition, 1.0)).rgb;
-    varyings.normal = (mvpMatrix * vec4(vertexNormal, 1.0)).rgb;
+    varyings.positionWS = (matrixData.modelMatrix * vec4(vertexPosition, 1.0)).rgb;
+    varyings.normalWS = (matrixData.modelMatrix * vec4(vertexNormal, 0.0)).rgb;
     varyings.uv = vertexUV;
-    gl_Position = mvpMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
+    gl_Position = matrixData.projectionMatrix * matrixData.viewMatrix * matrixData.modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
 }

@@ -26,6 +26,8 @@ set(IMGUI_SOURCES
         core/Rendering/LightShaderData.h
         core/Rendering/ModelRenderer.cpp
         core/Rendering/ModelRenderer.h
+        core/Rendering/MatrixShaderData.cpp
+        core/Rendering/MatrixShaderData.h
 )
 
 add_executable(RawEngine main.cpp
