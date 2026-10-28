@@ -26,6 +26,12 @@ struct MatrixData
    mat4 projectionMatrix;
 };
 
+struct CameraData
+{
+    vec3 cameraPosition;
+};
+
+uniform CameraData cameraData;
 uniform MatrixData matrixData;
 uniform int lightCount;
 uniform Light lights[20];

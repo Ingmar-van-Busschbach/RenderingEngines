@@ -197,8 +197,8 @@ int main() {
     //Generate Lights
     std::vector<core::objects::Light*> lights;
     lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
-    lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-10.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0,0),0,0));
-    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0,0),5,3));
+    lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),0,0));
+    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.1f,0.1f),5,3));
     lights.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
 
 
@@ -239,8 +239,10 @@ int main() {
 
         processCameraInput(window, camera, deltaTime);
         processInput(window);
+        quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         modelRenderer.ApplyLightShaderData(lights);
+        modelRenderer.ApplyCamareaShaderData(camera.cameraPos);
         modelRenderer.Render(quadModel, 1, camera.modelMatrix, projection, cmgtGatoTexture);
         modelRenderer.Render(suzanne2, 1, camera.modelMatrix, projection, cmgtGatoTexture);
         modelRenderer.Render(suzanne, 1, camera.modelMatrix, projection, cmgtGatoTexture);

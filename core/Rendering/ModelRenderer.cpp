@@ -23,6 +23,7 @@ namespace core::rendering
         shaderPrograms.clear();
         lightShaderDatas.clear();
         matrixShaderDatas.clear();
+        cameraShaderDatas.clear();
         textureUniforms.clear();
         matrixUniforms.clear();
     }
@@ -51,8 +52,10 @@ namespace core::rendering
         {
             lightShaderDatas.push_back(core::rendering::LightShaderData(lightCount, shaderPrograms.at(i)));
             lightShaderDatas.at(i).GetUniforms();
-            matrixShaderDatas.push_back(shaderPrograms.at(i));
+            matrixShaderDatas.push_back(core::rendering::MatrixShaderData(shaderPrograms.at(i)));
             matrixShaderDatas.at(i).GetUniforms();
+            cameraShaderDatas.push_back(core::rendering::CameraShaderData(shaderPrograms.at(i)));
+            cameraShaderDatas.at(i).GetUniforms();
             textureUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "text"));
             matrixUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "mvpMatrix"));
         }
@@ -69,6 +72,14 @@ namespace core::rendering
     void ModelRenderer::ApplyMatrixShaderData(const int index, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) const
     {
         matrixShaderDatas.at(index).ApplyUniforms(modelMatrix, viewMatrix, projectionMatrix);
+    }
+
+    void ModelRenderer::ApplyCamareaShaderData(glm::vec3 cameraPosition) const
+    {
+        for (int i = 0; i < cameraShaderDatas.size(); i++)
+        {
+            cameraShaderDatas.at(i).ApplyUniforms(cameraPosition);
+        }
     }
 
     void ModelRenderer::Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::Texture texture) const
