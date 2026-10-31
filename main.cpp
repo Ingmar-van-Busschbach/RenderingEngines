@@ -4,12 +4,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 #include <sstream>
-#include "core/mesh.h"
+#include "core/Data/mesh.h"
 #include "core/assimpLoader.h"
 #include "core/Objects/camera.h"
 #include "core/Objects/Light.h"
 #include "core/UserConfig.h"
-#include "core/texture.h"
+#include "core/Data/texture.h"
 #include "core/Rendering/ModelRenderer.h"
 
 //#define MAC_CLION
@@ -185,6 +185,12 @@ int main() {
     core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     suzanne2.translate(glm::vec3(6, 0,0));
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
+    core::Texture crystalAlbedoTexture("textures/Crystals_base_color.png");
+    core::Texture crystalSpecularTexture("textures/Crystals_specular_roughness.png");
+    core::Texture crystalNormalTexture("textures/Crystals_normal.png");
+    core::Texture tilesAlbedoTexture("textures/Tiles_base_color.png");
+    core::Texture tilesSpecularTexture("textures/Tiles_specular_roughness.png");
+    core::Texture tilesNormalTexture("textures/Tiles_normal.png");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     glClearColor(clearColor.r,
@@ -198,9 +204,14 @@ int main() {
     std::vector<core::objects::Light*> lights;
     lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
     lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),0,0));
-    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.1f,0.1f),5,3));
+    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),5,3));
     lights.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
 
+    //Generate Materials
+    std::vector<core::data::Material*> materials;
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
+    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
 
     // Load Light Shader Data
     modelRenderer.GenerateShaderDatas(lights.size());
@@ -225,27 +236,34 @@ int main() {
 
 
 
-
+    int materialIndex = 0;
     //FrameLoop
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        //ImGui::Begin("Raw Engine v2");
+        ImGui::Begin("Material Selector");
         //ImGui::Text("Hello :)");
-        //ImGui::End();
+        if (ImGui::Button("Switch Material"))
+        {
+            materialIndex++;
+            if (materialIndex >= materials.size())
+            {
+                materialIndex = 0;
+            }
+        }
+        ImGui::End();
 
         processCameraInput(window, camera, deltaTime);
         processInput(window);
         quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         modelRenderer.ApplyLightShaderData(lights);
-        modelRenderer.ApplyCamareaShaderData(camera.cameraPos);
-        modelRenderer.Render(quadModel, 1, camera.modelMatrix, projection, cmgtGatoTexture);
-        modelRenderer.Render(suzanne2, 1, camera.modelMatrix, projection, cmgtGatoTexture);
-        modelRenderer.Render(suzanne, 1, camera.modelMatrix, projection, cmgtGatoTexture);
+        modelRenderer.ApplyCamaraShaderData(camera.cameraPos);
+        modelRenderer.Render(quadModel, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
+        modelRenderer.Render(suzanne2, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
+        modelRenderer.Render(suzanne, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

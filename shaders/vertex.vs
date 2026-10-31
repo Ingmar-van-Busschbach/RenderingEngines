@@ -17,6 +17,7 @@ struct Varyings
     vec3 positionWS;
     vec3 normalWS;
     vec2 uv;
+    mat3 TBN;
 };
 
 struct MatrixData
@@ -38,6 +39,7 @@ uniform Light lights[20];
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec2 vertexUV;
+layout (location = 3) in vec3 vertexTangent;
 out Varyings varyings;
 
 void main()
@@ -45,5 +47,11 @@ void main()
     varyings.positionWS = (matrixData.modelMatrix * vec4(vertexPosition, 1.0)).rgb;
     varyings.normalWS = (matrixData.modelMatrix * vec4(vertexNormal, 0.0)).rgb;
     varyings.uv = vertexUV;
+    mat3 normalMatrix = mat3(transpose(inverse(matrixData.modelMatrix)));
+    vec3 N = normalize (normalMatrix * vertexNormal);
+    vec3 T = normalize (normalMatrix * vertexTangent);
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+    varyings.TBN = mat3(T, B, N);
     gl_Position = matrixData.projectionMatrix * matrixData.viewMatrix * matrixData.modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
 }

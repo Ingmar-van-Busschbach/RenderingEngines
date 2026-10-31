@@ -2,8 +2,8 @@
 
 #include <string>
 #include <assimp/scene.h>
-#include "mesh.h"
-#include "model.h"
+#include "Data/mesh.h"
+#include "Objects/model.h"
 
 namespace core {
 

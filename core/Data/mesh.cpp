@@ -9,8 +9,10 @@ namespace core {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
+
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(sizeof(Vertex) * vertices.size()), &vertices[0],
                      GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -22,6 +24,8 @@ namespace core {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, normal));
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, uv));
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, tangent));
         glBindVertexArray(0);
     }
 
@@ -56,7 +60,7 @@ namespace core {
         std::vector<Vertex> vertexVector;
         vertexVector.reserve(6);
         for (int i = 0; i < 6; ++i) {
-            vertexVector.emplace_back(pos[i], normals[i], uvs[i]);
+            vertexVector.emplace_back(pos[i], normals[i], uvs[i], glm::vec3(1.0f, 0.0f, 0.0f));
         }
 
         return Mesh(vertexVector, indices);

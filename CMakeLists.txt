@@ -15,8 +15,8 @@ set(IMGUI_SOURCES
         imgui/imgui_widgets.cpp
         imgui/backends/imgui_impl_glfw.cpp
         imgui/backends/imgui_impl_opengl3.cpp
-        core/texture.cpp
-        core/texture.h
+        core/Data/texture.cpp
+        core/Data/texture.h
         core/Objects/camera.cpp
         core/Objects/camera.h
         core/UserConfig.h
@@ -30,17 +30,21 @@ set(IMGUI_SOURCES
         core/Rendering/MatrixShaderData.h
         core/Rendering/CameraShaderData.cpp
         core/Rendering/CameraShaderData.h
+        core/Rendering/MaterialShaderData.cpp
+        core/Rendering/MaterialShaderData.h
+        core/Data/Material.cpp
+        core/Data/Material.h
 )
 
 add_executable(RawEngine main.cpp
         ${IMGUI_SOURCES}
         core/assimpLoader.cpp
         core/assimpLoader.h
-        core/mesh.cpp
-        core/mesh.h
+        core/Data/mesh.cpp
+        core/Data/mesh.h
         core/vertex.h
-        core/model.cpp
-        core/model.h
+        core/Objects/model.cpp
+        core/Objects/model.h
 )
 
 add_custom_command(

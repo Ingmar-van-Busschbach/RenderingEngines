@@ -1,5 +1,5 @@
 #include "assimpLoader.h"
-#include "mesh.h"
+#include "Data/mesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -7,7 +7,7 @@
 namespace core {
     Model AssimpLoader::loadModel(const std::string& path) {
         Assimp::Importer import;
-        const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+        const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
@@ -37,6 +37,7 @@ namespace core {
         std::vector<Vertex> vertices;
         std::vector<GLuint> indices;
         glm::vec2 uvs(0, 0);
+        glm::vec3 tangent(1.0f, 0.0f,0.0f);
         for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
             if (mesh->mTextureCoords[0] != nullptr) {
                 aiVector3D assimpUVs = mesh->mTextureCoords[0][i];
@@ -46,7 +47,11 @@ namespace core {
                 uvs.x = 0.0f;
                 uvs.y = 0.0f;
             }
-            vertices.emplace_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z), glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z), uvs);
+            if (mesh->HasTangentsAndBitangents())
+            {
+                tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            }
+            vertices.emplace_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z), glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z), uvs, tangent);
         }
         aiFace face;
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {

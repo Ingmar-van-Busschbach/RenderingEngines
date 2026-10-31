@@ -17,6 +17,7 @@ struct Varyings
     vec3 positionWS;
     vec3 normalWS;
     vec2 uv;
+    mat3 TBN;
 };
 
 struct MatrixData
@@ -31,20 +32,55 @@ struct CameraData
     vec3 cameraPosition;
 };
 
+struct Material
+{
+    int materialType;
+    sampler2D albedoTexture;
+    sampler2D specularTexture;
+    sampler2D normalTexture;
+    vec3 albedoColor;
+    float specularIntensity;
+};
+
+uniform Material material;
 uniform CameraData cameraData;
 uniform MatrixData matrixData;
 uniform int lightCount;
 uniform Light lights[20];
-uniform sampler2D text;
 in Varyings varyings;
 
 out vec4 FragColor;
 
 void main()
 {
-    float specularPower = 256;
-    vec4 objectColor = texture(text, varyings.uv);
+    //Declare base variables
     vec3 finalColor = vec3(0,0,0);
+    vec4 objectColor = vec4(1,1,1,1);
+    float specularPower = 256;
+    vec3 normal = normalize(varyings.normalWS);
+
+    //Load data from material
+    if(material.materialType == 0 || material.materialType == 2)
+    {
+        objectColor = texture(material.albedoTexture, varyings.uv);
+    }
+    else
+    {
+        objectColor = vec4(material.albedoColor, 1);
+    }
+    if(material.materialType == 0)
+    {
+        specularPower *= texture(material.specularTexture, varyings.uv).r;
+        normal = texture(material.normalTexture, varyings.uv).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+        normal = normalize(varyings.TBN * normal);
+    }
+    else
+    {
+        specularPower *= material.specularIntensity;
+    }
+
+    //Light Calculation
     vec3 cameraDirection = normalize(varyings.positionWS - cameraData.cameraPosition);
     for(int i = 0; i < lightCount; i++)
     {
@@ -54,23 +90,23 @@ void main()
         //Directional
         if(lights[i].lightType == 0)
         {
-            diffuseColor += max(dot(normalize(lights[i].lightDirection), varyings.normalWS),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
-            vec3 reflection = reflect(lights[i].lightDirection, varyings.normalWS);
+            diffuseColor += max(dot(normalize(lights[i].lightDirection), normal),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
+            vec3 reflection = reflect(lights[i].lightDirection, normal);
             specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
         }
         //Point
-        if(lights[i].lightType == 1)
+        else if(lights[i].lightType == 1)
         {
             vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
-            diffuseColor += max(dot(lightDirection, varyings.normalWS),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
-            vec3 reflection = reflect(lightDirection, varyings.normalWS);
+            diffuseColor += max(dot(lightDirection, normal),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
+            vec3 reflection = reflect(lightDirection, normal);
             specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
         }
         //Spot
-        if(lights[i].lightType == 2)
+        else if(lights[i].lightType == 2)
         {
             vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
-            float angle = (dot(lightDirection, varyings.normalWS) - 1) * -90;
+            float angle = (dot(lightDirection, normal) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
             if(angle < lights[i].spotLightAngle)
             {
                 float angleRatio = 0;
@@ -79,13 +115,13 @@ void main()
                     angleRatio = max(angle - lights[i].spotLightFalloff / lights[i].spotLightAngle - lights[i].spotLightFalloff,0);
                 }
                 angleRatio = 1 - angleRatio;
-                diffuseColor += max(dot(lightDirection, varyings.normalWS),0) * lights[i].lightIntensity * angleRatio * lights[i].lightColor.rgb * objectColor.rgb;
-                vec3 reflection = reflect(lightDirection, varyings.normalWS);
+                diffuseColor += max(dot(lightDirection, normal),0) * lights[i].lightIntensity * angleRatio * lights[i].lightColor.rgb * objectColor.rgb;
+                vec3 reflection = reflect(lightDirection, normal);
                 specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
             }
         }
         //Ambient
-        if(lights[i].lightType == 3)
+        else if(lights[i].lightType == 3)
         {
             ambientColor += lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
         }

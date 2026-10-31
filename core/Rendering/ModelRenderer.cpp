@@ -5,8 +5,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../core/model.h"
-#include "../core/texture.h"
+#include "MaterialShaderData.h"
+#include "../Objects/model.h"
+#include "../Data/material.h"
 
 namespace core::rendering
 {
@@ -56,8 +57,8 @@ namespace core::rendering
             matrixShaderDatas.at(i).GetUniforms();
             cameraShaderDatas.push_back(core::rendering::CameraShaderData(shaderPrograms.at(i)));
             cameraShaderDatas.at(i).GetUniforms();
-            textureUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "text"));
-            matrixUniforms.push_back(glGetUniformLocation(shaderPrograms.at(i), "mvpMatrix"));
+            materialShaderDatas.push_back(core::rendering::MaterialShaderData(shaderPrograms.at(i)));
+            materialShaderDatas.at(i).GetUniforms();
         }
     }
 
@@ -74,7 +75,7 @@ namespace core::rendering
         matrixShaderDatas.at(index).ApplyUniforms(modelMatrix, viewMatrix, projectionMatrix);
     }
 
-    void ModelRenderer::ApplyCamareaShaderData(glm::vec3 cameraPosition) const
+    void ModelRenderer::ApplyCamaraShaderData(glm::vec3 cameraPosition) const
     {
         for (int i = 0; i < cameraShaderDatas.size(); i++)
         {
@@ -82,15 +83,17 @@ namespace core::rendering
         }
     }
 
-    void ModelRenderer::Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::Texture texture) const
+    void ModelRenderer::ApplyMaterialShaderData(int shaderProgramIndex, core::data::Material material) const
+    {
+        materialShaderDatas.at(shaderProgramIndex).ApplyUniforms(material);
+    }
+
+    void ModelRenderer::Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::data::Material material) const
     {
         glUseProgram(shaderPrograms.at(shaderProgramIndex));
         this->ApplyMatrixShaderData(shaderProgramIndex, model.getModelMatrix(), viewMatrix, projectionMatrix);
-        glActiveTexture(GL_TEXTURE0);
-        glUniform1i(textureUniforms.at(shaderProgramIndex), 0);
-        glBindTexture(GL_TEXTURE_2D, texture.getId());
+        this->ApplyMaterialShaderData(shaderProgramIndex, material);
         model.render();
         glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0);
     }
 }
