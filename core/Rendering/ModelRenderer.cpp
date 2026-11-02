@@ -43,6 +43,7 @@ namespace core::rendering
             printf("Error! Making Shader Program: %s\n", infoLog);
             return 0;
         }
+        printf("Loaded Shader Program at index: %i\n", shaderProgram);
         shaderPrograms.push_back(shaderProgram);
         return shaderProgram;
     }

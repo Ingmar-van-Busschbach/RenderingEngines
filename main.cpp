@@ -186,6 +186,8 @@ int main() {
     core::Model suzanne = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     core::Model suzanne3 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    core::Model spaceship = core::AssimpLoader::loadModel("models/spaceship.obj");
+    spaceship.translate(glm::vec3(0,-5,0));
     suzanne2.translate(glm::vec3(6, 0,0));
     suzanne3.translate(glm::vec3(-4, 0,0));
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
@@ -195,6 +197,9 @@ int main() {
     core::Texture tilesAlbedoTexture("textures/Tiles_base_color.png");
     core::Texture tilesSpecularTexture("textures/Tiles_specular_roughness.png");
     core::Texture tilesNormalTexture("textures/Tiles_normal.png");
+    core::Texture spaceshipAlbedoTexture("textures/spaceship_albedo.jpg");
+    core::Texture spaceshipSpecularTexture("textures/spaceship_specular.jpg");
+    core::Texture spaceshipNormalTexture("textures/spaceship_normal.jpg");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     glClearColor(clearColor.r,
@@ -222,28 +227,22 @@ int main() {
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
     materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipSpecularTexture.getId(), spaceshipNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
 
+    std::vector<core::objects::SceneObject*> sceneObjects;
+    sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 1));
+    sceneObjects.push_back(new core::objects::SceneObject(&suzanne,materials.at(1), 1));
+    sceneObjects.push_back(new core::objects::SceneObject(&suzanne2,materials.at(2), 1));
 
-    core::objects::SceneObject object1(&quadModel,materials.at(0), 1);
-    core::objects::SceneObject object2(&suzanne,materials.at(1), 1);
-    core::objects::SceneObject object3(&suzanne2,materials.at(2), 1);
-
-    core::objects::SceneObject object4(&quadModel,materials.at(1), 1);
-    core::objects::SceneObject object5(&suzanne2,materials.at(2), 1);
-    core::objects::SceneObject object6(&suzanne3,materials.at(0), 1);
+    std::vector<core::objects::SceneObject*> sceneObjects2;
+    sceneObjects2.push_back(new core::objects::SceneObject(&quadModel,materials.at(1), 1));
+    sceneObjects2.push_back(new core::objects::SceneObject(&suzanne2,materials.at(2), 1));
+    sceneObjects2.push_back(new core::objects::SceneObject(&suzanne3,materials.at(0), 1));
+    sceneObjects2.push_back(new core::objects::SceneObject(&spaceship,materials.at(3), 1));
 
     std::vector<core::Scene*> scenes;
-    scenes.push_back(new core::Scene());
-    scenes.at(0)->lights = lights;
-    scenes.at(0)->sceneObjects.push_back(&object1);
-    scenes.at(0)->sceneObjects.push_back(&object2);
-    scenes.at(0)->sceneObjects.push_back(&object3);
-
-    scenes.push_back(new core::Scene());
-    scenes.at(1)->lights = lights2;
-    scenes.at(1)->sceneObjects.push_back(&object4);
-    scenes.at(1)->sceneObjects.push_back(&object5);
-    scenes.at(1)->sceneObjects.push_back(&object6);
+    scenes.push_back(new core::Scene(sceneObjects, lights));
+    scenes.push_back(new core::Scene(sceneObjects2, lights2));
 
     // Load Light Shader Data
     modelRenderer.GenerateShaderDatas(scenes.at(0)->lights.size());
@@ -320,6 +319,13 @@ int main() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    lights.clear();
+    lights2.clear();
+    materials.clear();
+    sceneObjects.clear();
+    sceneObjects2.clear();
+    scenes.clear();
 
     glfwTerminate();
     return 0;

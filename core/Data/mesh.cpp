@@ -2,6 +2,7 @@
 
 namespace core {
     Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices) : vertices(vertices), indices(indices) {
+        printf("Loaded Mesh with %i vertices\n", vertices.size());
         setupBuffers();
     }
 

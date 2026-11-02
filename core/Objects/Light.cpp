@@ -16,6 +16,22 @@ namespace core::objects
         this->lightAttenuation = lightAttenuation;
         this->spotLightAngle = spotLightAngle;
         this->spotLightFalloff = spotLightFalloff;
+        if (lightType == 0)
+        {
+            printf("Created Directional Light \n");
+        }
+        else if (lightType == 1)
+        {
+            printf("Created Point Light \n");
+        }
+        else if (lightType == 2)
+        {
+            printf("Created Spot Light \n");
+        }
+        else if (lightType == 3)
+        {
+            printf("Created Ambient Light \n");
+        }
     }
     Light::~Light() = default;
     int Light::GetLightType() const

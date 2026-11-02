@@ -16,6 +16,7 @@ namespace core
         std::vector<objects::Light*> lights;
 
         Scene();
+        Scene(std::vector<objects::SceneObject*> sceneObjects, std::vector<objects::Light*> lights);
         ~Scene();
     };
 } // core
