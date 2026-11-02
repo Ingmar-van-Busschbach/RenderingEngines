@@ -34,6 +34,10 @@ set(IMGUI_SOURCES
         core/Rendering/MaterialShaderData.h
         core/Data/Material.cpp
         core/Data/Material.h
+        core/Objects/SceneObject.cpp
+        core/Objects/SceneObject.h
+        core/Scene.cpp
+        core/Scene.h
 )
 
 add_executable(RawEngine main.cpp

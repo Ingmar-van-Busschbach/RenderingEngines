@@ -91,8 +91,8 @@ void main()
         if(lights[i].lightType == 0)
         {
             diffuseColor += max(dot(normalize(lights[i].lightDirection), normal),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
-            vec3 reflection = reflect(lights[i].lightDirection, normal);
-            specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
+            vec3 reflection = reflect(normalize(lights[i].lightDirection), normal);
+            specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb * lights[i].lightIntensity;
         }
         //Point
         else if(lights[i].lightType == 1)
@@ -100,7 +100,7 @@ void main()
             vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
             diffuseColor += max(dot(lightDirection, normal),0) * lights[i].lightIntensity * lights[i].lightColor.rgb * objectColor.rgb;
             vec3 reflection = reflect(lightDirection, normal);
-            specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
+            specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb * lights[i].lightIntensity;
         }
         //Spot
         else if(lights[i].lightType == 2)
@@ -117,7 +117,7 @@ void main()
                 angleRatio = 1 - angleRatio;
                 diffuseColor += max(dot(lightDirection, normal),0) * lights[i].lightIntensity * angleRatio * lights[i].lightColor.rgb * objectColor.rgb;
                 vec3 reflection = reflect(lightDirection, normal);
-                specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb;
+                specularColor += pow(max(dot(reflection, cameraDirection),0), specularPower) * lights[i].lightColor.rgb * objectColor.rgb * lights[i].lightIntensity;
             }
         }
         //Ambient

@@ -16,7 +16,7 @@ namespace core {
                 format = GL_RGBA;
             }
 
-            printf("Loaded with %d x %d [Components: %d]!\r\n", width, height, nrComponents);
+            printf("Loaded Texture with resolution of %d x %d [Components: %d]!\r\n", width, height, nrComponents);
             glBindTexture(GL_TEXTURE_2D, id);
             glTexImage2D(GL_TEXTURE_2D, 0,
                          static_cast<GLint>(format)

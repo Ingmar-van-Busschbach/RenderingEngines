@@ -6,10 +6,12 @@
 #include <sstream>
 #include "core/Data/mesh.h"
 #include "core/assimpLoader.h"
+#include "core/Scene.h"
 #include "core/Objects/camera.h"
 #include "core/Objects/Light.h"
 #include "core/UserConfig.h"
 #include "core/Data/texture.h"
+#include "core/Objects/SceneObject.h"
 #include "core/Rendering/ModelRenderer.h"
 
 //#define MAC_CLION
@@ -183,7 +185,9 @@ int main() {
 
     core::Model suzanne = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    core::Model suzanne3 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     suzanne2.translate(glm::vec3(6, 0,0));
+    suzanne3.translate(glm::vec3(-4, 0,0));
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
     core::Texture crystalAlbedoTexture("textures/Crystals_base_color.png");
     core::Texture crystalSpecularTexture("textures/Crystals_specular_roughness.png");
@@ -197,15 +201,21 @@ int main() {
                  clearColor.g, clearColor.b, clearColor.a);
 
 
-    core::objects::Camera camera = core::objects::Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    core::objects::Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(g_width) / static_cast<float>(g_height), 0.1f, 100.0f);
 
     //Generate Lights
     std::vector<core::objects::Light*> lights;
-    lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
+    lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
     lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),0,0));
     lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),5,3));
     lights.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
+
+    std::vector<core::objects::Light*> lights2;
+    lights2.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 1), glm::vec4(1,1,1,1), 1.0f, glm::vec3(0,0,0),0,0));
+    lights2.push_back(new core::objects::Light(core::objects::Point, glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),0,0));
+    lights2.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0, 0, 1), glm::vec4(1,0,1,1), 0.3f, glm::vec3(0,0.05f,0.05f),5,3));
+    lights2.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,1,1,1),0.1f, glm::vec3(0,0,0),0,0));
 
     //Generate Materials
     std::vector<core::data::Material*> materials;
@@ -213,8 +223,32 @@ int main() {
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
     materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
 
+
+    core::objects::SceneObject object1(&quadModel,materials.at(0), 1);
+    core::objects::SceneObject object2(&suzanne,materials.at(1), 1);
+    core::objects::SceneObject object3(&suzanne2,materials.at(2), 1);
+
+    core::objects::SceneObject object4(&quadModel,materials.at(1), 1);
+    core::objects::SceneObject object5(&suzanne2,materials.at(2), 1);
+    core::objects::SceneObject object6(&suzanne3,materials.at(0), 1);
+
+    std::vector<core::Scene*> scenes;
+    scenes.push_back(new core::Scene());
+    scenes.at(0)->lights = lights;
+    scenes.at(0)->sceneObjects.push_back(&object1);
+    scenes.at(0)->sceneObjects.push_back(&object2);
+    scenes.at(0)->sceneObjects.push_back(&object3);
+
+    scenes.push_back(new core::Scene());
+    scenes.at(1)->lights = lights2;
+    scenes.at(1)->sceneObjects.push_back(&object4);
+    scenes.at(1)->sceneObjects.push_back(&object5);
+    scenes.at(1)->sceneObjects.push_back(&object6);
+
     // Load Light Shader Data
-    modelRenderer.GenerateShaderDatas(lights.size());
+    modelRenderer.GenerateShaderDatas(scenes.at(0)->lights.size());
+    modelRenderer.ApplyLightShaderData(scenes.at(0)->lights);
+
 
     double currentTime = glfwGetTime();
     double finishFrameTime = 0.0;
@@ -236,22 +270,24 @@ int main() {
 
 
 
-    int materialIndex = 0;
+    int sceneIndex = 0;
     //FrameLoop
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("Material Selector");
+        ImGui::Begin("Scene Selector");
         //ImGui::Text("Hello :)");
-        if (ImGui::Button("Switch Material"))
+        if (ImGui::Button("Switch Scene"))
         {
-            materialIndex++;
-            if (materialIndex >= materials.size())
+            sceneIndex++;
+            if (sceneIndex >= scenes.size())
             {
-                materialIndex = 0;
+                sceneIndex = 0;
             }
+            modelRenderer.GenerateShaderDatas(scenes.at(sceneIndex)->lights.size());
+            modelRenderer.ApplyLightShaderData(scenes.at(sceneIndex)->lights);
         }
         ImGui::End();
 
@@ -259,11 +295,11 @@ int main() {
         processInput(window);
         quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
-        modelRenderer.ApplyLightShaderData(lights);
         modelRenderer.ApplyCamaraShaderData(camera.cameraPos);
-        modelRenderer.Render(quadModel, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
-        modelRenderer.Render(suzanne2, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
-        modelRenderer.Render(suzanne, 1, camera.modelMatrix, projection, *materials.at(materialIndex));
+        for (core::objects::SceneObject* sceneObject : scenes.at(sceneIndex)->sceneObjects)
+        {
+            modelRenderer.Render(sceneObject->model, sceneObject->shaderProgramIndex, camera.modelMatrix, projection, sceneObject->material);
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -49,15 +49,19 @@ namespace core::rendering
 
     void ModelRenderer::GenerateShaderDatas(int lightCount)
     {
+        lightShaderDatas.clear();
+        matrixShaderDatas.clear();
+        cameraShaderDatas.clear();
+        materialShaderDatas.clear();
         for (int i = 0; i < shaderPrograms.size(); i++)
         {
             lightShaderDatas.push_back(core::rendering::LightShaderData(lightCount, shaderPrograms.at(i)));
             lightShaderDatas.at(i).GetUniforms();
-            matrixShaderDatas.push_back(core::rendering::MatrixShaderData(shaderPrograms.at(i)));
+            matrixShaderDatas.push_back(shaderPrograms.at(i));
             matrixShaderDatas.at(i).GetUniforms();
-            cameraShaderDatas.push_back(core::rendering::CameraShaderData(shaderPrograms.at(i)));
+            cameraShaderDatas.push_back(shaderPrograms.at(i));
             cameraShaderDatas.at(i).GetUniforms();
-            materialShaderDatas.push_back(core::rendering::MaterialShaderData(shaderPrograms.at(i)));
+            materialShaderDatas.push_back(shaderPrograms.at(i));
             materialShaderDatas.at(i).GetUniforms();
         }
     }
@@ -83,17 +87,17 @@ namespace core::rendering
         }
     }
 
-    void ModelRenderer::ApplyMaterialShaderData(int shaderProgramIndex, core::data::Material material) const
+    void ModelRenderer::ApplyMaterialShaderData(int shaderProgramIndex, core::data::Material* material) const
     {
-        materialShaderDatas.at(shaderProgramIndex).ApplyUniforms(material);
+        materialShaderDatas.at(shaderProgramIndex).ApplyUniforms(*material);
     }
 
-    void ModelRenderer::Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::data::Material material) const
+    void ModelRenderer::Render(core::Model* model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::data::Material* material) const
     {
         glUseProgram(shaderPrograms.at(shaderProgramIndex));
-        this->ApplyMatrixShaderData(shaderProgramIndex, model.getModelMatrix(), viewMatrix, projectionMatrix);
+        this->ApplyMatrixShaderData(shaderProgramIndex, model->getModelMatrix(), viewMatrix, projectionMatrix);
         this->ApplyMaterialShaderData(shaderProgramIndex, material);
-        model.render();
+        model->render();
         glBindVertexArray(0);
     }
 }

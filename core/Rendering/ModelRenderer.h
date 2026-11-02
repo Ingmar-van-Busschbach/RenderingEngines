@@ -32,8 +32,8 @@ namespace core::rendering
         void ApplyLightShaderData(const std::vector<objects::Light*>& lights);
         void ApplyMatrixShaderData(int index, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) const;
         void ApplyCamaraShaderData(glm::vec3 cameraPosition) const;
-        void ApplyMaterialShaderData(int shaderProgramIndex, core::data::Material material) const;
-        void Render(core::Model model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::data::Material material) const;
+        void ApplyMaterialShaderData(int shaderProgramIndex, core::data::Material* material) const;
+        void Render(core::Model* model, int shaderProgramIndex, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix, core::data::Material* material) const;
     };
 }
 

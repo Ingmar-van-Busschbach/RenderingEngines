@@ -50,4 +50,13 @@ namespace core::objects
     {
         return spotLightFalloff;
     }
+
+    void Light::SetPosition(glm::vec3 position)
+    {
+        this->lightPosition = position;
+    }
+    void Light::Translate(glm::vec3 direction)
+    {
+        this->lightPosition = this->lightPosition + direction;
+    }
 }
