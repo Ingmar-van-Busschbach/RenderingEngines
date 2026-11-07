@@ -13,6 +13,7 @@
 #include "core/Data/texture.h"
 #include "core/Objects/SceneObject.h"
 #include "core/Rendering/ModelRenderer.h"
+#include "core/Rendering/SkyboxRenderer.h"
 
 //#define MAC_CLION
 #define VSTUDIO
@@ -168,15 +169,35 @@ int main() {
     const GLuint vertexShader = generateShader("shaders/vertex.vs", GL_VERTEX_SHADER);
     const GLuint fragmentShader = generateShader("shaders/fragment.fs", GL_FRAGMENT_SHADER);
     const GLuint textureShader = generateShader("shaders/texture.fs", GL_FRAGMENT_SHADER);
+    const GLuint skyboxVertexShader = generateShader("shaders/skybox.vs", GL_VERTEX_SHADER);
+    const GLuint skyboxFragmentShader = generateShader("shaders/skybox.fs", GL_FRAGMENT_SHADER);
 
     core::rendering::ModelRenderer modelRenderer;
-    modelRenderer.GenerateShaderProgram(modelVertexShader, textureShader);
+    modelRenderer.GenerateShaderProgram(skyboxVertexShader, skyboxFragmentShader);
     modelRenderer.GenerateShaderProgram(vertexShader, fragmentShader);
 
     glDeleteShader(modelVertexShader);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     glDeleteShader(textureShader);
+    glDeleteShader(skyboxVertexShader);
+    glDeleteShader(skyboxFragmentShader);
+
+    core::rendering::SkyboxRenderer skyboxRenderer(modelRenderer.shaderPrograms[0]);
+
+    core::Mesh skyBox = core::Mesh::generateSkyBox();
+
+    std::string facesCubemap[6] =
+    {
+        "textures/right.jpg",
+        "textures/left.png",
+        "textures/top.png",
+        "textures/bottom.png",
+        "textures/front.png",
+        "textures/back.png"
+    };
+
+    core::Texture skyBoxTexture(facesCubemap);
 
     core::Mesh quad = core::Mesh::generateQuad();
     core::Model quadModel({quad});
@@ -184,27 +205,32 @@ int main() {
     quadModel.scale(glm::vec3(5, 5, 1));
 
     core::Model suzanne = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+
     core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    suzanne2.translate(glm::vec3(6, 0,0));
+
     core::Model suzanne3 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    suzanne3.translate(glm::vec3(-4, 0,0));
+
     core::Model spaceship = core::AssimpLoader::loadModel("models/spaceship.obj");
     spaceship.translate(glm::vec3(0,-5,0));
-    suzanne2.translate(glm::vec3(6, 0,0));
-    suzanne3.translate(glm::vec3(-4, 0,0));
+
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
+
     core::Texture crystalAlbedoTexture("textures/Crystals_base_color.png");
     core::Texture crystalSpecularTexture("textures/Crystals_specular_roughness.png");
     core::Texture crystalNormalTexture("textures/Crystals_normal.png");
+
     core::Texture tilesAlbedoTexture("textures/Tiles_base_color.png");
     core::Texture tilesSpecularTexture("textures/Tiles_specular_roughness.png");
     core::Texture tilesNormalTexture("textures/Tiles_normal.png");
+
     core::Texture spaceshipAlbedoTexture("textures/spaceship_albedo.jpg");
     core::Texture spaceshipSpecularTexture("textures/spaceship_specular.jpg");
     core::Texture spaceshipNormalTexture("textures/spaceship_normal.jpg");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-    glClearColor(clearColor.r,
-                 clearColor.g, clearColor.b, clearColor.a);
-
+    glClearColor(clearColor.r,clearColor.g, clearColor.b, clearColor.a);
 
     core::objects::Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(g_width) / static_cast<float>(g_height), 0.1f, 100.0f);
@@ -255,20 +281,6 @@ int main() {
     float rotationStrength = 100.0f;
     bool faceTarget = false;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     int sceneIndex = 0;
     //FrameLoop
     while (!glfwWindowShouldClose(window)) {
@@ -294,12 +306,14 @@ int main() {
         processInput(window);
         quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
+
         modelRenderer.ApplyCamaraShaderData(camera.cameraPos);
         for (core::objects::SceneObject* sceneObject : scenes.at(sceneIndex)->sceneObjects)
         {
             modelRenderer.Render(sceneObject->model, sceneObject->shaderProgramIndex, camera.modelMatrix, projection, sceneObject->material);
         }
-
+        skyboxRenderer.ApplyMatrices(camera.modelMatrix, projection);
+        skyboxRenderer.Render(skyBox, skyBoxTexture);
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

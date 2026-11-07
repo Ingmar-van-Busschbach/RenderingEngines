@@ -11,6 +11,7 @@ namespace core {
 
     public:
         Texture(const std::string& path);
+        Texture(const std::string path[6]);
 
         GLuint getId();
     };

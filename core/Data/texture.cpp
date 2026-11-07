@@ -34,6 +34,45 @@ namespace core {
         }
     }
 
+    Texture::Texture(const std::string path[6])
+    {
+        glGenTextures(1, &id);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        for (unsigned int i = 0; i < 6; i++)
+        {
+            int width, height, nrComponents;
+            unsigned char *data = stbi_load(path[i].c_str(), &width, &height, &nrComponents, 0);
+            if (data)
+            {
+                stbi_set_flip_vertically_on_load(false);
+                glTexImage2D
+                (
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                    0,
+                    GL_RGB,
+                    width,
+                    height,
+                    0,
+                    GL_RGB,
+                    GL_UNSIGNED_BYTE,
+                    data
+                    );
+                stbi_image_free(data);
+                printf("Loaded Texture with resolution of %d x %d [Components: %d]!\r\n", width, height, nrComponents);
+            }
+            else
+            {
+                printf("Texture failed to load at path: %s\n", path[i].c_str());
+                stbi_image_free(data);
+            }
+        }
+    }
+
     GLuint Texture::getId() {
         return id;
     }

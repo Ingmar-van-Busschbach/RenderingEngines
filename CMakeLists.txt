@@ -38,6 +38,8 @@ set(IMGUI_SOURCES
         core/Objects/SceneObject.h
         core/Scene.cpp
         core/Scene.h
+        core/Rendering/SkyboxRenderer.cpp
+        core/Rendering/SkyboxRenderer.h
 )
 
 add_executable(RawEngine main.cpp

@@ -14,7 +14,7 @@ namespace core
     {
         this->sceneObjects = sceneObjects;
         this->lights = lights;
-        printf("Initialized Scene with %i objects and %i lights\n", sceneObjects.size(), lights.size());
+        printf("Initialized Scene with %zi objects and %zi lights\n", sceneObjects.size(), lights.size());
     }
 
     Scene::~Scene()
