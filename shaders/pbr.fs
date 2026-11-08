@@ -148,7 +148,23 @@ vec4 CalcTotalPBRLighting()
         roughness = texture(material.roughnessTexture, varyings.uv).r;
     }
     for(int i = 0; i < lightCount; i++){
-        if(lights[i].lightType == 3){
+        if(lights[i].lightType == 2){
+            vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
+                  float angle = (dot(lightDirection, normal) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
+                  if(angle < lights[i].spotLightAngle)
+                  {
+                      float angleRatio = 0;
+                      if(lights[i].spotLightAngle - lights[i].spotLightFalloff > 0)
+                      {
+                          angleRatio = max(angle - lights[i].spotLightFalloff / lights[i].spotLightAngle - lights[i].spotLightFalloff,0);
+                      }
+                      angleRatio = 1 - angleRatio;
+                      vec3 color = CalcPBRLighting(lights[i], normal, objectColor.rgb, metallic, roughness);
+                      color *= angleRatio;
+                      finalColor += color;
+                  }
+        }
+        else if(lights[i].lightType == 3){
             finalColor += lights[i].lightColor.rgb * lights[i].lightIntensity * 0.01;
         }
         else{
