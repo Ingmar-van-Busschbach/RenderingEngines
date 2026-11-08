@@ -24,10 +24,18 @@ namespace core::rendering
         specularTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.normalTexture";
         normalTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.metallicTexture";
+        metallicTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.roughnessTexture";
+        roughnessTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.albedoColor";
         albedoColorUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.specularIntensity";
         specularIntensityUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.metallic";
+        metallicUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.roughness";
+        roughnessUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
     }
     void MaterialShaderData::ApplyUniforms(data::Material material) const
     {
@@ -44,8 +52,17 @@ namespace core::rendering
         glActiveTexture(GL_TEXTURE0 + 2);
         glUniform1i(normalTextureUniform, 2);
         glBindTexture(GL_TEXTURE_2D, material.normalTextureID);
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glUniform1i(metallicTextureUniform, 3);
+        glBindTexture(GL_TEXTURE_2D, material.metallicTextureID);
+        glActiveTexture(GL_TEXTURE0 + 4);
+        glUniform1i(roughnessTextureUniform, 4);
+        glBindTexture(GL_TEXTURE_2D, material.roughnessTextureID);
+
 
         glUniform3fv(albedoColorUniform, 1, glm::value_ptr(material.albedoColor));
         glUniform1f(specularIntensityUniform, material.specularIntensity);
+        glUniform1f(metallicUniform, material.metallic);
+        glUniform1f(roughnessUniform, material.roughness);
     }
 } // core

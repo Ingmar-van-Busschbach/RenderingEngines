@@ -229,7 +229,8 @@ int main() {
     core::Texture tilesNormalTexture("textures/Tiles_normal.png");
 
     core::Texture spaceshipAlbedoTexture("textures/spaceship_albedo.jpg");
-    core::Texture spaceshipSpecularTexture("textures/spaceship_specular.jpg");
+    core::Texture spaceshipMetallicTexture("textures/spaceship_metallic.jpg");
+    core::Texture spaceshipRoughnessTexture("textures/spaceship_roughness.jpg");
     core::Texture spaceshipNormalTexture("textures/spaceship_normal.jpg");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -256,14 +257,13 @@ int main() {
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), 0, 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
     materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipSpecularTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::PBRWithTextures, tilesAlbedoTexture.getId(), 0, tilesNormalTexture.getId(), tilesMetalTexture.getId() , tilesSpecularTexture.getId(), glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::PBRWithoutTextures, cmgtGatoTexture.getId(), 0, 0, 0 , 0, glm::vec3(1,1,1), 0.5f, 1 , 1));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipMetallicTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::PBRWithTextures, spaceshipAlbedoTexture.getId(), 0, spaceshipNormalTexture.getId(), spaceshipMetallicTexture.getId() , spaceshipRoughnessTexture.getId(), glm::vec3(1,1,1), 0.5f, 0 , 0));
 
     std::vector<core::objects::SceneObject*> sceneObjects;
     sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 1));
     sceneObjects.push_back(new core::objects::SceneObject(&suzanne,materials.at(1), 1));
-    sceneObjects.push_back(new core::objects::SceneObject(&suzanne2,materials.at(2), 2));
+    sceneObjects.push_back(new core::objects::SceneObject(&spaceship,materials.at(4), 2));
 
     std::vector<core::objects::SceneObject*> sceneObjects2;
     sceneObjects2.push_back(new core::objects::SceneObject(&quadModel,materials.at(1), 1));

@@ -26,7 +26,7 @@ namespace core::data
         GLuint albedoTextureID;
         GLuint specularTextureID;
         GLuint normalTextureID;
-        GLuint metalTextureID;
+        GLuint metallicTextureID;
         GLuint roughnessTextureID;
 
         glm::vec3 albedoColor;
@@ -35,7 +35,7 @@ namespace core::data
         float metallic;
         float roughness;
 
-        Material(MaterialType materialType, GLuint albedoTextureID, GLuint specularTextureID, GLuint normalTextureID, GLuint metalTextureID, GLuint roughnessTextureID, glm::vec3 albedoColor = glm::vec3(0,0,0), float specularIntensity = 0, float metallic = 0, float roughness = 0);
+        Material(MaterialType materialType, GLuint albedoTextureID, GLuint specularTextureID, GLuint normalTextureID, GLuint metallicTextureID, GLuint roughnessTextureID, glm::vec3 albedoColor = glm::vec3(0,0,0), float specularIntensity = 0, float metallic = 0, float roughness = 0);
         ~Material();
     };
 } // core

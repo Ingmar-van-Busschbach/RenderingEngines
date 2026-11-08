@@ -38,8 +38,12 @@ struct Material
     sampler2D albedoTexture;
     sampler2D specularTexture;
     sampler2D normalTexture;
+    sampler2D metallicTexture;
+    sampler2D roughnessTexture;
     vec3 albedoColor;
     float specularIntensity;
+    float metallic;
+    float roughness;
 };
 
 uniform Material material;
@@ -55,7 +59,7 @@ void main()
 {
     //Declare base variables
     vec3 finalColor = vec3(0,0,0);
-    vec4 objectColor = vec4(1,1,1,1);
+    vec4 objectColor = vec4(material.albedoColor, 1);
     float specularPower = 256;
     vec3 normal = normalize(varyings.normalWS);
 
@@ -63,10 +67,6 @@ void main()
     if(material.materialType == 0 || material.materialType == 2)
     {
         objectColor = texture(material.albedoTexture, varyings.uv);
-    }
-    else
-    {
-        objectColor = vec4(material.albedoColor, 1);
     }
     if(material.materialType == 0)
     {
