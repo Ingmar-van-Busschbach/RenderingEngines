@@ -86,7 +86,7 @@ vec3 CalcPBRLighting(Light light, vec3 normal, vec3 albedo, float metallic, floa
     vec3 l = vec3(0.0);
 
     if(light.lightType == 0){
-        l = -light.lightDirection;
+        l = light.lightDirection;
     }
     else{
         l = light.lightPosition - varyings.positionWS;
