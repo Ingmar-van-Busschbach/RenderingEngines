@@ -134,7 +134,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow *window = glfwCreateWindow(g_width, g_height, "LearnOpenGL", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(g_width, g_height, "RenderingEngine", NULL, NULL);
     if (window == NULL) {
         printf("Failed to create GLFW window\n");
         glfwTerminate();
@@ -171,10 +171,12 @@ int main() {
     const GLuint textureShader = generateShader("shaders/texture.fs", GL_FRAGMENT_SHADER);
     const GLuint skyboxVertexShader = generateShader("shaders/skybox.vs", GL_VERTEX_SHADER);
     const GLuint skyboxFragmentShader = generateShader("shaders/skybox.fs", GL_FRAGMENT_SHADER);
+    const GLuint pbrFragmentShader = generateShader("shaders/pbr.fs", GL_FRAGMENT_SHADER);
 
     core::rendering::ModelRenderer modelRenderer;
     modelRenderer.GenerateShaderProgram(skyboxVertexShader, skyboxFragmentShader);
     modelRenderer.GenerateShaderProgram(vertexShader, fragmentShader);
+    modelRenderer.GenerateShaderProgram(vertexShader, pbrFragmentShader);
 
     glDeleteShader(modelVertexShader);
     glDeleteShader(vertexShader);
@@ -223,6 +225,7 @@ int main() {
 
     core::Texture tilesAlbedoTexture("textures/Tiles_base_color.png");
     core::Texture tilesSpecularTexture("textures/Tiles_specular_roughness.png");
+    core::Texture tilesMetalTexture("textures/Tiles_MetallicSmoothness.png");
     core::Texture tilesNormalTexture("textures/Tiles_normal.png");
 
     core::Texture spaceshipAlbedoTexture("textures/spaceship_albedo.jpg");
@@ -250,15 +253,17 @@ int main() {
 
     //Generate Materials
     std::vector<core::data::Material*> materials;
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
-    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipSpecularTexture.getId(), spaceshipNormalTexture.getId(), glm::vec3(1,1,1), 0.5f));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), 0, 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipSpecularTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::PBRWithTextures, tilesAlbedoTexture.getId(), 0, tilesNormalTexture.getId(), tilesMetalTexture.getId() , tilesSpecularTexture.getId(), glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::PBRWithoutTextures, cmgtGatoTexture.getId(), 0, 0, 0 , 0, glm::vec3(1,1,1), 0.5f, 1 , 1));
 
     std::vector<core::objects::SceneObject*> sceneObjects;
     sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 1));
     sceneObjects.push_back(new core::objects::SceneObject(&suzanne,materials.at(1), 1));
-    sceneObjects.push_back(new core::objects::SceneObject(&suzanne2,materials.at(2), 1));
+    sceneObjects.push_back(new core::objects::SceneObject(&suzanne2,materials.at(2), 2));
 
     std::vector<core::objects::SceneObject*> sceneObjects2;
     sceneObjects2.push_back(new core::objects::SceneObject(&quadModel,materials.at(1), 1));

@@ -82,23 +82,23 @@ namespace core {
         };
         const std::vector<GLuint> indices = {
             // Right
-            1, 2, 6,
-            6, 5, 1,
+            1, 6, 2,
+            6, 1, 5,
             // Left
-            0, 4, 7,
-            7, 3, 0,
+            0, 7, 4,
+            7, 0, 3,
             // Top
-            4, 5, 6,
-            6, 7, 4,
+            4, 6, 5,
+            6, 4, 7,
             // Bottom
-            0, 3, 2,
-            2, 1, 0,
+            0, 2, 3,
+            2, 0, 1,
             // Back
-            0, 1, 5,
-            5, 4, 0,
+            0, 5, 1,
+            5, 0, 4,
             // Front
-            3, 7, 6,
-            6, 2, 3
+            3, 6, 7,
+            6, 3, 2
         };
         std::vector<Vertex> vertexVector;
         vertexVector.reserve(8);
