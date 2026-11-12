@@ -40,6 +40,7 @@ namespace core::objects
         float GetSpotLightFalloff() const;
         void SetPosition(glm::vec3 position);
         void Translate(glm::vec3 translation);
+        void SetDirection(glm::vec3 direction);
     };
 }
 

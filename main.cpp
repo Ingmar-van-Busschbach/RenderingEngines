@@ -32,6 +32,16 @@
 #include <imgui_impl_opengl3.h>
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+extern "C" {
+// Force NVIDIA drivers to use the dedicated GPU
+_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+// Force AMD drivers to use the dedicated GPU
+_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
+
 int g_width = 800;
 int g_height = 600;
 
@@ -130,6 +140,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -172,11 +183,14 @@ int main() {
     const GLuint skyboxVertexShader = generateShader("shaders/skybox.vs", GL_VERTEX_SHADER);
     const GLuint skyboxFragmentShader = generateShader("shaders/skybox.fs", GL_FRAGMENT_SHADER);
     const GLuint pbrFragmentShader = generateShader("shaders/pbr.fs", GL_FRAGMENT_SHADER);
+    const GLuint waterVertexShader = generateShader("shaders/water.vs", GL_VERTEX_SHADER);
+    const GLuint waterFragmentShader = generateShader("shaders/water.fs", GL_FRAGMENT_SHADER);
 
     core::rendering::ModelRenderer modelRenderer;
     modelRenderer.GenerateShaderProgram(skyboxVertexShader, skyboxFragmentShader);
     modelRenderer.GenerateShaderProgram(vertexShader, fragmentShader);
     modelRenderer.GenerateShaderProgram(vertexShader, pbrFragmentShader);
+    modelRenderer.GenerateShaderProgram(waterVertexShader, waterFragmentShader);
 
     glDeleteShader(modelVertexShader);
     glDeleteShader(vertexShader);
@@ -261,7 +275,7 @@ int main() {
     materials.push_back(new core::data::Material(core::data::PBRWithTextures, spaceshipAlbedoTexture.getId(), 0, spaceshipNormalTexture.getId(), spaceshipMetallicTexture.getId() , spaceshipRoughnessTexture.getId(), glm::vec3(1,1,1), 0.5f, 0 , 0));
 
     std::vector<core::objects::SceneObject*> sceneObjects;
-    sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 1));
+    sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 3));
     sceneObjects.push_back(new core::objects::SceneObject(&suzanne,materials.at(1), 1));
     sceneObjects.push_back(new core::objects::SceneObject(&spaceship,materials.at(4), 2));
 
@@ -289,12 +303,17 @@ int main() {
     int sceneIndex = 0;
     //FrameLoop
     while (!glfwWindowShouldClose(window)) {
+        printf("1");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        printf("2");
         ImGui_ImplOpenGL3_NewFrame();
+        printf("3");
         ImGui_ImplGlfw_NewFrame();
+        printf("4");
         ImGui::NewFrame();
+        printf("5");
         ImGui::Begin("Scene Selector");
-        //ImGui::Text("Hello :)");
+        printf("6");
         if (ImGui::Button("Switch Scene"))
         {
             sceneIndex++;
@@ -303,30 +322,43 @@ int main() {
                 sceneIndex = 0;
             }
             modelRenderer.GenerateShaderDatas(scenes.at(sceneIndex)->lights.size());
-            modelRenderer.ApplyLightShaderData(scenes.at(sceneIndex)->lights);
         }
+        printf("7");
         ImGui::End();
-
+        printf("8");
         processCameraInput(window, camera, deltaTime);
         processInput(window);
-        quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
+        printf("9");
+        //quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
-
+        lights.at(0)->SetDirection(glm::vec3(glm::sin(currentTime), 2.0f, glm::cos(currentTime)));
+        printf("a");
+        modelRenderer.ApplyTimeShaderData(static_cast<float>(currentTime), deltaTime);
         modelRenderer.ApplyCamaraShaderData(camera.cameraPos);
+        modelRenderer.ApplyLightShaderData(scenes.at(sceneIndex)->lights);
+        printf("b");
         for (core::objects::SceneObject* sceneObject : scenes.at(sceneIndex)->sceneObjects)
         {
             modelRenderer.Render(sceneObject->model, sceneObject->shaderProgramIndex, camera.modelMatrix, projection, sceneObject->material);
         }
+        printf("c");
         skyboxRenderer.ApplyMatrices(camera.modelMatrix, projection);
         skyboxRenderer.Render(skyBox, skyBoxTexture);
+        printf("d");
         ImGui::Render();
+        printf("e");
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        printf("f");
         glfwSwapBuffers(window);
+        printf("g");
         glfwPollEvents();
+        printf("h");
         finishFrameTime = glfwGetTime();
+        printf("i");
         deltaTime = static_cast<float>(finishFrameTime - currentTime);
+        printf("j");
         currentTime = finishFrameTime;
+        printf("k \n");
     }
 
 
@@ -339,6 +371,30 @@ int main() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    for (int i = 0; i < lights.size(); i++)
+    {
+        delete(lights.at(i));
+    }
+    for (int i = 0; i < lights2.size(); i++)
+    {
+        delete(lights2.at(i));
+    }
+    for (int i = 0; i < materials.size(); i++)
+    {
+        delete(materials.at(i));
+    }
+    for (int i = 0; i < sceneObjects.size(); i++)
+    {
+        delete(sceneObjects.at(i));
+    }
+    for (int i = 0; i < sceneObjects2.size(); i++)
+    {
+        delete(sceneObjects2.at(i));
+    }
+    for (int i = 0; i < scenes.size(); i++)
+    {
+        delete(scenes.at(i));
+    }
     lights.clear();
     lights2.clear();
     materials.clear();

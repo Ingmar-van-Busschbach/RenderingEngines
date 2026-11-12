@@ -40,6 +40,8 @@ set(IMGUI_SOURCES
         core/Scene.h
         core/Rendering/SkyboxRenderer.cpp
         core/Rendering/SkyboxRenderer.h
+        core/Rendering/TimeShaderData.cpp
+        core/Rendering/TimeShaderData.h
 )
 
 add_executable(RawEngine main.cpp

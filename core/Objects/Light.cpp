@@ -3,6 +3,7 @@
 //
 
 #include "Light.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace core::objects
 {
@@ -74,5 +75,10 @@ namespace core::objects
     void Light::Translate(glm::vec3 direction)
     {
         this->lightPosition = this->lightPosition + direction;
+    }
+
+    void Light::SetDirection(glm::vec3 direction)
+    {
+        this->lightDirection = direction;
     }
 }
