@@ -310,17 +310,11 @@ int main() {
     int sceneIndex = 0;
     //FrameLoop
     while (!glfwWindowShouldClose(window)) {
-        printf("1");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        printf("2");
         ImGui_ImplOpenGL3_NewFrame();
-        printf("3");
         ImGui_ImplGlfw_NewFrame();
-        printf("4");
         ImGui::NewFrame();
-        printf("5");
         ImGui::Begin("Scene Selector");
-        printf("6");
         if (ImGui::Button("Switch Scene"))
         {
             sceneIndex++;
@@ -330,42 +324,29 @@ int main() {
             }
             modelRenderer.GenerateShaderDatas(scenes.at(sceneIndex)->lights.size());
         }
-        printf("7");
         ImGui::End();
-        printf("8");
         processCameraInput(window, camera, deltaTime);
         processInput(window);
-        printf("9");
         //quadModel.rotate(glm::vec3(0.0f, 0.0f, 1.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         suzanne.rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(rotationStrength) * static_cast<float>(deltaTime));
         lights.at(0)->SetDirection(glm::vec3(glm::sin(currentTime), 2.0f, glm::cos(currentTime)));
-        printf("a");
+        lights.at(2)->SetDirection(glm::vec3(-glm::cos(currentTime), 0.0f, glm::sin(currentTime)));
         modelRenderer.ApplyTimeShaderData(static_cast<float>(currentTime), deltaTime);
         modelRenderer.ApplyCamaraShaderData(camera.cameraPos);
         modelRenderer.ApplyLightShaderData(scenes.at(sceneIndex)->lights);
-        printf("b");
         for (core::objects::SceneObject* sceneObject : scenes.at(sceneIndex)->sceneObjects)
         {
             modelRenderer.Render(sceneObject->model, sceneObject->shaderProgramIndex, camera.modelMatrix, projection, sceneObject->material);
         }
-        printf("c");
         skyboxRenderer.ApplyMatrices(camera.modelMatrix, projection);
         skyboxRenderer.Render(skyBox, skyBoxTexture);
-        printf("d");
         ImGui::Render();
-        printf("e");
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        printf("f");
         glfwSwapBuffers(window);
-        printf("g");
         glfwPollEvents();
-        printf("h");
         finishFrameTime = glfwGetTime();
-        printf("i");
         deltaTime = static_cast<float>(finishFrameTime - currentTime);
-        printf("j");
         currentTime = finishFrameTime;
-        printf("k \n");
     }
 
 
