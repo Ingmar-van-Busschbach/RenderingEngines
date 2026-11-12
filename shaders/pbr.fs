@@ -56,9 +56,12 @@ in Varyings varyings;
 
 out vec4 FragColor;
 
-vec3 schlickFresnel(float vDotH)
+vec3 schlickFresnel(float vDotH, vec3 albedo, float metallic)
 {
     vec3 F0 = vec3(0.04);
+    if(metallic > 0){
+        F0 = mix(F0, albedo, metallic);
+    }
 
     vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
 
@@ -107,7 +110,7 @@ vec3 CalcPBRLighting(Light light, vec3 normal, vec3 albedo, float metallic, floa
     float nDotL = max(dot(n, l), 0.0);
     float nDotV = max(dot(n, v), 0.0);
 
-    vec3 F = schlickFresnel(vDotH);
+    vec3 F = schlickFresnel(vDotH, albedo, metallic);
 
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
