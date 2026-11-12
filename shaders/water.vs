@@ -166,5 +166,5 @@ void main()
     }
     vec3 speed = vec3(time.time * 0.5, 0.0, 0.0);
     mat4 mvp = matrixData.projectionMatrix * matrixData.viewMatrix * matrixData.modelMatrix;
-    gl_Position = mvp * vec4(vertexPosition + normal * cnoise(vertexPosition + speed) * 10, 1.0);
+    gl_Position = mvp * vec4(vertexPosition + normal * cnoise(vertexPosition + speed) * 5, 1.0);
 }

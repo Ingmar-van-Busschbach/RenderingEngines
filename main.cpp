@@ -217,10 +217,12 @@ int main() {
 
     core::Mesh quad = core::Mesh::generateQuad();
     core::Model quadModel({quad});
-    quadModel.translate(glm::vec3(0,0,-2.5));
+    quadModel.translate(glm::vec3(0,-2.5,0));
+    quadModel.rotate(glm::vec3(1,0,0), glm::radians(-90.0f));
     quadModel.scale(glm::vec3(5, 5, 1));
 
     core::Model suzanne = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
+    suzanne.translate(glm::vec3(0,3,0));
 
     core::Model suzanne2 = core::AssimpLoader::loadModel("models/nonormalmonkey.obj");
     suzanne2.translate(glm::vec3(6, 0,0));
@@ -229,9 +231,11 @@ int main() {
     suzanne3.translate(glm::vec3(-4, 0,0));
 
     core::Model spaceship = core::AssimpLoader::loadModel("models/spaceship.obj");
-    spaceship.translate(glm::vec3(0,-5,0));
+    spaceship.translate(glm::vec3(0,0,0));
 
     core::Texture cmgtGatoTexture("textures/CMGaTo_crop.png");
+
+    core::Texture waterTexture("textures/water.jpg");
 
     core::Texture crystalAlbedoTexture("textures/Crystals_base_color.png");
     core::Texture crystalSpecularTexture("textures/Crystals_specular_roughness.png");
@@ -275,9 +279,10 @@ int main() {
     materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
     materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipMetallicTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
     materials.push_back(new core::data::Material(core::data::PBRWithTextures, spaceshipAlbedoTexture.getId(), 0, spaceshipNormalTexture.getId(), spaceshipMetallicTexture.getId() , spaceshipRoughnessTexture.getId(), spaceShipAOTexture.getId(), spaceShipEmissiveTexture.getId(),glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, waterTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
 
     std::vector<core::objects::SceneObject*> sceneObjects;
-    sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 3));
+    sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(5), 3));
     sceneObjects.push_back(new core::objects::SceneObject(&suzanne,materials.at(1), 1));
     sceneObjects.push_back(new core::objects::SceneObject(&spaceship,materials.at(4), 2));
 
