@@ -28,6 +28,10 @@ namespace core::rendering
         metallicTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.roughnessTexture";
         roughnessTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.aoTexture";
+        aoTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.emissiveTexture";
+        emissiveTextureUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.albedoColor";
         albedoColorUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.specularIntensity";
@@ -36,6 +40,8 @@ namespace core::rendering
         metallicUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
         uniformLocation = "material.roughness";
         roughnessUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
+        uniformLocation = "material.emissiveColor";
+        emissiveColorUniform = glGetUniformLocation(shaderProgram, uniformLocation.c_str());
     }
     void MaterialShaderData::ApplyUniforms(data::Material material) const
     {
@@ -58,11 +64,17 @@ namespace core::rendering
         glActiveTexture(GL_TEXTURE0 + 4);
         glUniform1i(roughnessTextureUniform, 4);
         glBindTexture(GL_TEXTURE_2D, material.roughnessTextureID);
-
+        glActiveTexture(GL_TEXTURE0 + 5);
+        glUniform1i(aoTextureUniform, 5);
+        glBindTexture(GL_TEXTURE_2D, material.aoTextureID);
+        glActiveTexture(GL_TEXTURE0 + 6);
+        glUniform1i(emissiveTextureUniform, 6);
+        glBindTexture(GL_TEXTURE_2D, material.emissiveTextureID);
 
         glUniform3fv(albedoColorUniform, 1, glm::value_ptr(material.albedoColor));
         glUniform1f(specularIntensityUniform, material.specularIntensity);
         glUniform1f(metallicUniform, material.metallic);
         glUniform1f(roughnessUniform, material.roughness);
+        glUniform3fv(emissiveColorUniform, 1, glm::value_ptr(material.emissiveColor));
     }
 } // core

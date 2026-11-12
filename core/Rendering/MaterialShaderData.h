@@ -21,10 +21,13 @@ namespace core::rendering
         GLint normalTextureUniform;
         GLint metallicTextureUniform;
         GLint roughnessTextureUniform;
+        GLint aoTextureUniform;
+        GLint emissiveTextureUniform;
         GLint albedoColorUniform;
         GLint specularIntensityUniform;
         GLint metallicUniform;
         GLint roughnessUniform;
+        GLint emissiveColorUniform;
 
         MaterialShaderData(GLuint shaderProgram);
         ~MaterialShaderData();

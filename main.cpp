@@ -246,6 +246,8 @@ int main() {
     core::Texture spaceshipMetallicTexture("textures/spaceship_metallic.jpg");
     core::Texture spaceshipRoughnessTexture("textures/spaceship_roughness.jpg");
     core::Texture spaceshipNormalTexture("textures/spaceship_normal.jpg");
+    core::Texture spaceShipAOTexture("textures/spaceship_ao.jpg");
+    core::Texture spaceShipEmissiveTexture("textures/spaceship_emissive.jpg");
 
     glm::vec4 clearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     glClearColor(clearColor.r,clearColor.g, clearColor.b, clearColor.a);
@@ -257,7 +259,7 @@ int main() {
     std::vector<core::objects::Light*> lights;
     lights.push_back(new core::objects::Light(core::objects::Directional, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,1,1,1), 0.3f, glm::vec3(0,0,0),0,0));
     lights.push_back(new core::objects::Light(core::objects::Point, glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0), glm::vec4(1,0,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),0,0));
-    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),5,3));
+    lights.push_back(new core::objects::Light(core::objects::Spot, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0, 0, 1), glm::vec4(0,1,0,1), 0.3f, glm::vec3(0,0.05f,0.05f),2,1));
     lights.push_back(new core::objects::Light(core::objects::Ambient, glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3(-1, -1, -1), glm::vec4(0,0,1,1),0.1f, glm::vec3(0,0,0),0,0));
 
     std::vector<core::objects::Light*> lights2;
@@ -268,11 +270,11 @@ int main() {
 
     //Generate Materials
     std::vector<core::data::Material*> materials;
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), 0, 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipMetallicTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0, glm::vec3(1,1,1), 0.5f, 0 , 0));
-    materials.push_back(new core::data::Material(core::data::PBRWithTextures, spaceshipAlbedoTexture.getId(), 0, spaceshipNormalTexture.getId(), spaceshipMetallicTexture.getId() , spaceshipRoughnessTexture.getId(), glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, crystalAlbedoTexture.getId(), crystalSpecularTexture.getId(), crystalNormalTexture.getId(), 0, 0 ,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, tilesAlbedoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithOnlyAlbedoTexture, cmgtGatoTexture.getId(), tilesSpecularTexture.getId(), tilesNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::ADSWithTextures, spaceshipAlbedoTexture.getId(), spaceshipMetallicTexture.getId(), spaceshipNormalTexture.getId(), 0 , 0,0,0, glm::vec3(1,1,1), 0.5f, 0 , 0));
+    materials.push_back(new core::data::Material(core::data::PBRWithTextures, spaceshipAlbedoTexture.getId(), 0, spaceshipNormalTexture.getId(), spaceshipMetallicTexture.getId() , spaceshipRoughnessTexture.getId(), spaceShipAOTexture.getId(), spaceShipEmissiveTexture.getId(),glm::vec3(1,1,1), 0.5f, 0 , 0));
 
     std::vector<core::objects::SceneObject*> sceneObjects;
     sceneObjects.push_back(new core::objects::SceneObject(&quadModel,materials.at(0), 3));

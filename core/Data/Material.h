@@ -18,6 +18,7 @@ namespace core::data
         PBRWithTextures = 3,
         PBRWithoutTextures = 4,
         PBRWithOnlyAlbedoTexture = 5,
+        PBRWithOnlyAlbedoORMTexture = 6
     };
     class Material
     {
@@ -28,6 +29,8 @@ namespace core::data
         GLuint normalTextureID;
         GLuint metallicTextureID;
         GLuint roughnessTextureID;
+        GLuint aoTextureID;
+        GLuint emissiveTextureID;
 
         glm::vec3 albedoColor;
         float specularIntensity;
@@ -35,7 +38,9 @@ namespace core::data
         float metallic;
         float roughness;
 
-        Material(MaterialType materialType, GLuint albedoTextureID, GLuint specularTextureID, GLuint normalTextureID, GLuint metallicTextureID, GLuint roughnessTextureID, glm::vec3 albedoColor = glm::vec3(0,0,0), float specularIntensity = 0, float metallic = 0, float roughness = 0);
+        glm::vec3 emissiveColor;
+
+        Material(MaterialType materialType, GLuint albedoTextureID, GLuint specularTextureID, GLuint normalTextureID, GLuint metallicTextureID, GLuint roughnessTextureID, GLuint aoTextureID, GLuint emissiveTextureID, glm::vec3 albedoColor = glm::vec3(0,0,0), float specularIntensity = 0, float metallic = 0, float roughness = 0, glm::vec3 emissiveColor = glm::vec3(0,0,0));
         ~Material();
     };
 } // core

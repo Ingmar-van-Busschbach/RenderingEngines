@@ -106,7 +106,7 @@ void main()
         else if(lights[i].lightType == 2)
         {
             vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
-            float angle = (dot(lightDirection, normal) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
+            float angle = (dot(lightDirection, lights[i].lightDirection) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
             if(angle < lights[i].spotLightAngle)
             {
                 float angleRatio = 0;

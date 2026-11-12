@@ -41,10 +41,13 @@ struct Material
     sampler2D normalTexture;
     sampler2D metallicTexture;
     sampler2D roughnessTexture;
+    sampler2D aoTexture;
+    sampler2D emissiveTexture;
     vec3 albedoColor;
     float specularIntensity;
     float metallic;
     float roughness;
+    vec3 emissiveColor;
 };
 
 uniform Material material;
@@ -138,22 +141,29 @@ vec4 CalcTotalPBRLighting()
     vec3 normal = normalize(varyings.normalWS);
     float metallic = material.metallic;
     float roughness = material.roughness;
-    if(material.materialType == 3 || material.materialType == 5)
+    float ao = 1.0;
+    vec3 emissiveColor = material.emissiveColor;
+    if(material.materialType == 3 || material.materialType == 5 || material.materialType == 6)
     {
         objectColor = texture(material.albedoTexture, varyings.uv);
     }
-    if(material.materialType == 3)
+    if(material.materialType == 3 || material.materialType == 6)
     {
         normal = texture(material.normalTexture, varyings.uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
         normal = normalize(varyings.TBN * normal);
         metallic = texture(material.metallicTexture, varyings.uv).r;
         roughness = texture(material.roughnessTexture, varyings.uv).r;
+        ao = texture(material.aoTexture, varyings.uv).r;
+    }
+    if(material.materialType == 3)
+    {
+        emissiveColor = texture(material.emissiveTexture, varyings.uv).rgb;
     }
     for(int i = 0; i < lightCount; i++){
         if(lights[i].lightType == 2){
             vec3 lightDirection = normalize(lights[i].lightPosition - varyings.positionWS);
-                  float angle = (dot(lightDirection, normal) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
+                  float angle = (dot(lightDirection, lights[i].lightDirection) -1) * -90; // convert -1...1 to 180...0 to calculate the angle between the two directions
                   if(angle < lights[i].spotLightAngle)
                   {
                       float angleRatio = 0;
@@ -164,17 +174,22 @@ vec4 CalcTotalPBRLighting()
                       angleRatio = 1 - angleRatio;
                       vec3 color = CalcPBRLighting(lights[i], normal, objectColor.rgb, metallic, roughness);
                       color *= angleRatio;
+                      color *= ao;
                       finalColor += color;
                   }
         }
         else if(lights[i].lightType == 3){
-            finalColor += lights[i].lightColor.rgb * lights[i].lightIntensity * 0.01;
+            vec3 color = lights[i].lightColor.rgb * lights[i].lightIntensity * 0.01;
+            color *= ao;
+            finalColor += color;
         }
         else{
-            finalColor += CalcPBRLighting(lights[i], normal, objectColor.rgb, metallic, roughness);
+            vec3 color = CalcPBRLighting(lights[i], normal, objectColor.rgb, metallic, roughness);
+            color *= ao;
+            finalColor += color;
         }
     }
-
+    finalColor += emissiveColor;
     // HDR Tone Mapping
     finalColor = finalColor / (finalColor + vec3(1.0));
 
